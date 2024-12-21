@@ -2,6 +2,7 @@ using LibraryManagementWeb.Client.Pages;
 using LibraryManagementWeb.Components;
 using LibraryManagementWeb.Components.Account;
 using LibraryManagementWeb.Data;
+using LibraryManagementWeb.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,10 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+// Set up the services
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7222/") });
+builder.Services.AddScoped<IBookService, BookService>();
 
 var app = builder.Build();
 

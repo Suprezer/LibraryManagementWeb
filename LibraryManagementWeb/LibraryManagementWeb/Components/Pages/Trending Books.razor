@@ -1,0 +1,56 @@
+﻿@page "/Popular_Books"
+@using LibraryManagementAPI.DTOs
+@using LibraryManagementWeb.Services
+@inject IBookService BookService
+
+<h3>Trending Books</h3>
+
+@if (books == null)
+{
+	<p><em>Loading...</em></p>
+}
+else if (errorMessage != null)
+{
+	<p class="text-danger">@errorMessage</p>
+}
+else
+{
+	<table class="table">
+		<thead>
+		<tr>
+			<th>Title</th>
+			<th>ISBN</th>
+			<th>Genre</th>
+			<th>Published Date</th>
+		</tr>
+		</thead>
+		<tbody>
+		@foreach (var book in books)
+		{
+			<tr>
+				<td>@book.Title</td>
+				<td>@book.ISBN</td>
+				<td>@book.Genre</td>
+				<td>@book.PublishedDate.ToShortDateString()</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+}
+
+@code {
+	private IEnumerable<Book>? books;
+	private string? errorMessage;
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			books = await BookService.GetAllBooksAsync();
+		}
+		catch (Exception ex)
+		{
+			errorMessage = $"Error loading books: {ex.Message}";
+		}
+	}
+}
