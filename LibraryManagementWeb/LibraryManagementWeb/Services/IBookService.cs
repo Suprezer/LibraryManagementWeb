@@ -1,4 +1,4 @@
-﻿using LibraryManagementAPI.DTOs;
+﻿using LibraryManagementWeb.Models;
 
 namespace LibraryManagementWeb.Services;
 

@@ -1,0 +1,157 @@
+﻿@page "/orderbooks"
+
+@using Microsoft.AspNetCore.Authorization
+@using LibraryManagementWeb.Models
+@using LibraryManagementWeb.Models.Filters
+@using LibraryManagementWeb.Services
+
+@rendermode InteractiveServer
+
+@inject IOpenLibraryBookService OpenLibraryBookService
+
+@attribute [Authorize]
+
+<style>
+    .table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        .table th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #4CAF50;
+            color: white;
+        }
+
+    .cover-image {
+        width: 50px;
+        height: auto;
+    }
+
+    .placeholder-image {
+        width: 50px;
+        height: 75px; /* Adjust height to match the aspect ratio of the cover image */
+        background-color: #f0f0f0;
+        display: inline-block;
+    }
+
+    .form-control {
+        margin-bottom: 10px;
+    }
+
+    .btn-primary {
+        margin-bottom: 20px;
+    }
+
+    .rating {
+        color: #FFD700;
+    }
+</style>
+
+<PageTitle>Order Books</PageTitle>
+
+<h1>Order New Books</h1>
+
+<div>
+    <label for="search">Search by Title:</label>
+    <input type="text" id="search" @bind="searchValue" class="form-control" @onkeypress="HandleKeyPress" />
+</div>
+
+<button @onclick="HandleSearch" class="btn btn-primary">Search</button>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+@if (books != null && books.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cover</th>
+                <th>Title</th>
+                <th>Authors</th>
+                <th>Languages</th>
+                <th>Median Page Count</th>
+                <th>Edition Count</th>
+                <th>First Published Year</th>
+                <th>Total Rating Count</th>
+                <th>Average Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var book in books)
+            {
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(book.CoverEditionKey))
+                        {
+                            <img src="https://covers.openlibrary.org/b/olid/@book.CoverEditionKey-M.jpg" alt="Cover Image" class="cover-image" onerror="this.onerror=null;this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 50 75%22%3E%3Crect width=%2250%22 height=%2275%22 fill=%22%23f0f0f0%22/%3E%3C/svg%3E';" />
+                        }
+                        else
+                        {
+                            <div class="placeholder-image"></div>
+                        }
+                    </td>
+                    <td>@book.Title</td>
+                    <td>@string.Join(", ", book.Authors?.Select(a => a.AuthorName) ?? new List<string>())</td>
+                    <td>@string.Join(", ", book.Languages)</td>
+                    <td>@book.MedianPageCount</td>
+                    <td>@book.EditionCount</td>
+                    <td>@book.FirstPublishedYear?.ToString("yyyy")</td>
+                    <td>@book.TotalRatingCount</td>
+                    <td class="rating">@Math.Round(book.RatingsAverage ?? 0, 1)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private BookSearchCriteria criteria = new BookSearchCriteria();
+    private IEnumerable<Book>? books;
+    private string? errorMessage;
+    private string searchValue = string.Empty;
+
+    private async Task HandleSearch()
+    {
+        Console.WriteLine("HandleSearch method triggered");
+
+        try
+        {
+            criteria.Title = searchValue;
+            criteria.Author = null;
+
+            books = await OpenLibraryBookService.GetOpenLibraryBooksAsync(criteria);
+            books = books.OrderByDescending(b => b.EditionCount);
+            Console.WriteLine("Books retrieved and sorted successfully");
+            StateHasChanged(); // Ensure the UI is updated
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error searching books: {ex.Message}";
+            Console.WriteLine(errorMessage);
+            StateHasChanged(); // Ensure the UI is updated
+        }
+    }
+
+    // Being able to search by pressing enter
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await HandleSearch();
+        }
+    }
+}
+
+

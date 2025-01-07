@@ -42,6 +42,7 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 // Set up the services
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7222/") });
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IOpenLibraryBookService, OpenLibraryBookService>();
 
 var app = builder.Build();
 
