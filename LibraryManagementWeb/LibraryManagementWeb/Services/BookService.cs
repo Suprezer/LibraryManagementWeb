@@ -12,6 +12,7 @@ public class BookService : IBookService
     {
         _httpClient = httpClient;
     }
+
     public async Task<IEnumerable<Book>> GetAllBooksAsync()
     {
         var response = await _httpClient.GetAsync("api/Books");

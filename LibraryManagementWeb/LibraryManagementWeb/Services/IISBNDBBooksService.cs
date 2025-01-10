@@ -3,8 +3,8 @@ using LibraryManagementWeb.Models.Filters;
 
 namespace LibraryManagementWeb.Services
 {
-    public interface IOpenLibraryBookService
+    public interface IISBNDBBooksService
     {
-        Task<IEnumerable<Book>> GetOpenLibraryBooksAsync(BookSearchCriteria criteria);
+        Task<BookCollection> GetISBNDBBooksAsync(BookSearchCriteria searchCriteria);
     }
 }
