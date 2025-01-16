@@ -1,7 +1,6 @@
 ﻿@page "/Popular_Books"
 @using LibraryManagementWeb.Models
 @using LibraryManagementWeb.Services
-@inject IBookService BookService
 
 <h3>Trending Books</h3>
 
@@ -11,13 +10,6 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		try
-		{
-			books = await BookService.GetAllBooksAsync();
-		}
-		catch (Exception ex)
-		{
-			errorMessage = $"Error loading books: {ex.Message}";
-		}
+
 	}
 }

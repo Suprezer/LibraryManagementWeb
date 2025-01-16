@@ -1,8 +1,9 @@
 ﻿using LibraryManagementWeb.Models;
-using System;
+using LibraryManagementWeb.Services.Interfaces;
+using System.Net.Http.Json;
 
 
-namespace LibraryManagementWeb.Services;
+namespace LibraryManagementWeb.Services.Services;
 
 public class BookService : IBookService
 {

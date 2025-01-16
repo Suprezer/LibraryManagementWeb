@@ -1,8 +1,13 @@
+using LibraryManagementWeb.Business.Implementations;
+using LibraryManagementWeb.Business.Interfaces;
+using LibraryManagementWeb.Business.Security;
 using LibraryManagementWeb.Client.Pages;
 using LibraryManagementWeb.Components;
 using LibraryManagementWeb.Components.Account;
 using LibraryManagementWeb.Data;
 using LibraryManagementWeb.Services;
+using LibraryManagementWeb.Services.Interfaces;
+using LibraryManagementWeb.Services.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -39,10 +44,16 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
-// Set up the services
+// Register the HttpClient
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7222/") });
-builder.Services.AddScoped<IBookService, BookService>();
+
+// Register Business Services
+builder.Services.AddScoped<IISBNDBBooksBusiness, ISBNDBBooksBusiness>();
+builder.Services.AddScoped<ITokenManager, TokenManager>();
+
+// Register Services
 builder.Services.AddScoped<IISBNDBBooksService, ISBNDBBooksService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 

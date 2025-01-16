@@ -1,13 +1,13 @@
 ﻿@page "/orderbooks"
 
+@using LibraryManagementWeb.Business.Interfaces
 @using Microsoft.AspNetCore.Authorization
 @using LibraryManagementWeb.Models
 @using LibraryManagementWeb.Models.Filters
-@using LibraryManagementWeb.Services
 
 @rendermode InteractiveServer
 
-@inject IISBNDBBooksService ISBNDBBooksService
+@inject IISBNDBBooksBusiness ISBNDBBooksBusiness
 
 @attribute [Authorize]
 
@@ -279,7 +279,7 @@
 
     private async Task SearchBooks()
     {
-        var result = await ISBNDBBooksService.GetISBNDBBooksAsync(searchCriteria);
+        var result = await ISBNDBBooksBusiness.GetISBNDBBooksAsync(searchCriteria);
         books = result.Books.ToList();
         totalBooks = result.TotalBooks;
     }

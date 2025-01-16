@@ -8,7 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\LibraryManagementWeb.Business\LibraryManagementWeb.Business.csproj" />
+    <ProjectReference Include="..\..\LibraryManagementWeb.Services\LibraryManagementWeb.Services.csproj" />
     <ProjectReference Include="..\LibraryManagementWeb.Client\LibraryManagementWeb.Client.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="9.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
