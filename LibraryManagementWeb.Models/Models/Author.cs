@@ -9,7 +9,6 @@ namespace LibraryManagementWeb.Models
     public class Author
     {
         public Guid? Id { get; set; }
-        public string AuthorKey { get; set; }
         public string AuthorName { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }

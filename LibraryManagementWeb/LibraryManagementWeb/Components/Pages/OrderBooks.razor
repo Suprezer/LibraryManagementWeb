@@ -8,6 +8,7 @@
 @rendermode InteractiveServer
 
 @inject IISBNDBBooksBusiness ISBNDBBooksBusiness
+@inject IOrderBusiness OrderBusiness
 
 @attribute [Authorize]
 
@@ -232,7 +233,7 @@
                 <p><strong>Pages:</strong> @book.Pages</p>
                 <p><strong>Edition:</strong> @book.Edition</p>
                 <div class="quantity-container">
-                    <select @bind="book.Quantity">
+                    <select @bind="book.TempQuantity">
                         @for (int i = 1; i <= 10; i++)
                         {
                             <option value="@i">@i</option>
@@ -255,14 +256,14 @@
         <span class="close" @onclick="CloseOrderOverview">&times;</span>
         <h4>Order Overview</h4>
         <ul class="order-overview">
-            @foreach (var book in selectedBooks)
+            @foreach (var orderLine in order.OrderLines)
             {
                 <li>
                     <div>
-                        <img src="@book.CoverImage" alt="Cover Image" />
-                        @book.Title - Quantity: @book.Quantity
+                        <img src="@orderLine.Book.CoverImage" alt="Cover Image" />
+                        @orderLine.Book.Title - Quantity: @orderLine.Quantity
                     </div>
-                    <button class="remove-button" @onclick="() => RemoveBook(book)">Remove</button>
+                    <button class="remove-button" @onclick="() => RemoveBook(orderLine)">Remove</button>
                 </li>
             }
         </ul>
@@ -273,7 +274,7 @@
 @code {
     private BookSearchCriteria searchCriteria = new BookSearchCriteria { Page = 1, PageSize = 10 };
     private List<Book> books = new List<Book>();
-    private List<Book> selectedBooks = new List<Book>();
+    private Order order = new Order();
     private int totalBooks;
     private bool showModal = false;
 
@@ -304,16 +305,15 @@
 
     private void OrderBook(Book book)
     {
-        // Add the book to the selectedBooks list with the specified quantity
-        selectedBooks.Add(book);
-        Console.WriteLine($"Ordered {book.Quantity} copies of {book.Title}");
+        var orderLine = new OrderLine { Book = book, Quantity = book.TempQuantity };
+        order.OrderLines.Add(orderLine);
+        Console.WriteLine($"Ordered {book.TempQuantity} copies of {book.Title}");
     }
 
-    private void RemoveBook(Book book)
+    private void RemoveBook(OrderLine orderLine)
     {
-        // Remove the book from the selectedBooks list
-        selectedBooks.Remove(book);
-        Console.WriteLine($"Removed {book.Title} from order");
+        order.OrderLines.Remove(orderLine);
+        Console.WriteLine($"Removed {orderLine.Book.Title} from order");
     }
 
     private void ShowOrderOverview()
@@ -326,12 +326,17 @@
         showModal = false;
     }
 
-    private void SendOrder()
+    private async Task SendOrder()
     {
-        // Send selectedBooks to your API
-        foreach (var book in selectedBooks)
+        var success = await OrderBusiness.PlaceOrderAsync(order);
+        if (success)
         {
-            Console.WriteLine($"Ordered {book.Quantity} copies of {book.Title}");
+            Console.WriteLine("Order successfully created.");
+            order = new Order(); // Reset the order
+        }
+        else
+        {
+            Console.WriteLine("Failed to create order.");
         }
         CloseOrderOverview();
     }

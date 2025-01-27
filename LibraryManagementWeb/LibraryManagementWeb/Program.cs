@@ -37,7 +37,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
@@ -47,13 +47,20 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 // Register the HttpClient
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7222/") });
 
+
 // Register Business Services
 builder.Services.AddScoped<IISBNDBBooksBusiness, ISBNDBBooksBusiness>();
 builder.Services.AddScoped<ITokenManager, TokenManager>();
+builder.Services.AddScoped<IOrderBusiness, OrderBusiness>();
+builder.Services.AddScoped<IBooksBusiness, BooksBusiness>();
+builder.Services.AddScoped<IBorrowingBusiness, BorrowingBusiness>();
 
 // Register Services
 builder.Services.AddScoped<IISBNDBBooksService, ISBNDBBooksService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IBorrowingService, BorrowingService>();
 
 var app = builder.Build();
 

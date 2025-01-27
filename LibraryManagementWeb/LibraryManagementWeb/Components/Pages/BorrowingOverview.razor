@@ -1,0 +1,164 @@
+﻿@page "/borrowingoverview"
+@inject IBorrowingBusiness BorrowingBusiness
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@rendermode InteractiveServer
+
+@using LibraryManagementWeb.Business.Interfaces
+@using LibraryManagementWeb.Models
+@using LibraryManagementWeb.Models.Models
+@using LibraryManagementWeb.Models.Models.Filters
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize]
+
+<style>
+    .search-container {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    .search-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: space-between;
+    }
+
+    .search-controls-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .search-container select, .search-container input, .search-container button {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .search-container input {
+        width: 300px;
+    }
+
+    .pagination {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+        .pagination button {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+    .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 16px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        height: 500px;
+        position: relative;
+    }
+
+        .card img {
+            width: 120px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .card h3 {
+            margin: 10px 0;
+            font-size: 18px;
+            white-space: normal;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+</style>
+
+<PageTitle>Borrowing Overview</PageTitle>
+
+<h1>Borrowing Overview</h1>
+
+@if (borrowings == null)
+{
+    <p>Loading...</p>
+}
+else if (!borrowings.Any())
+{
+    <p>No borrowings found.</p>
+}
+else
+{
+    <div class="card-container">
+        @foreach (var borrowing in borrowings)
+        {
+            <div class="card">
+                <img src="@borrowing.Book.CoverImage" alt="Cover Image" />
+                <h3>@borrowing.Book.Title</h3>
+                <p><strong>Pages:</strong> @borrowing.Book.Pages</p>
+                <p><strong>Language:</strong> @borrowing.Book.Language</p>
+                <p><strong>Borrow Date:</strong> @borrowing.BorrowDate?.ToString("yyyy-MM-dd")</p>
+                <p><strong>Return Date:</strong> @borrowing.ReturnDate?.ToString("yyyy-MM-dd")</p>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Borrowing> borrowings = new List<Borrowing>();
+    private string userName;
+    private Guid userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userName = user.Identity.Name;
+            userId = Guid.Parse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            await LoadBorrowings();
+        }
+        else
+        {
+            userName = "Guest";
+            userId = Guid.Empty;
+        }
+    }
+
+    private async Task LoadBorrowings()
+    {
+        if (userId != Guid.Empty)
+        {
+            borrowings = (await BorrowingBusiness.GetBorrowingBooksByUserIdAsync(userId)).ToList();
+        }
+        else
+        {
+            borrowings = new List<Borrowing>();
+        }
+    }
+}

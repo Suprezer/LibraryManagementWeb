@@ -1,4 +1,5 @@
 ﻿using LibraryManagementWeb.Models;
+using LibraryManagementWeb.Models.Filters;
 using LibraryManagementWeb.Services.Interfaces;
 using System.Net.Http.Json;
 
@@ -14,10 +15,13 @@ public class BookService : IBookService
         _httpClient = httpClient;
     }
 
-    public async Task<IEnumerable<Book>> GetAllBooksAsync()
+    public async Task<BookCollection> GetBooksAsync(BookSearchCriteria searchCriteria, string token)
     {
-        var response = await _httpClient.GetAsync("api/Books");
+        _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+        var response = await _httpClient.PostAsJsonAsync("api/books/search", searchCriteria);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<IEnumerable<Book>>();
+
+        return await response.Content.ReadFromJsonAsync<BookCollection>();
     }
 }

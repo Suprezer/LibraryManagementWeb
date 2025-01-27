@@ -1,8 +1,9 @@
 ﻿using LibraryManagementWeb.Models;
+using LibraryManagementWeb.Models.Filters;
 
 namespace LibraryManagementWeb.Services.Interfaces;
 
 public interface IBookService
 {
-    Task<IEnumerable<Book>> GetAllBooksAsync();
+    Task<BookCollection> GetBooksAsync(BookSearchCriteria searchCriteria, string token);
 }
